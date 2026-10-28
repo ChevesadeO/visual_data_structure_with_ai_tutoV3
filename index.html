@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visual Data Structures</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-logo-wrap">
+        <img src="img/logo.png" alt="Visual Data Structure" class="hero-logo" />
+      </div>
+      <p>
+        Herramienta interactiva para comprender listas enlazadas, pilas, colas,
+        árboles BST y grafos mediante visualización dinámica.
+      </p>
+    </header>
+
+    <main class="main-card">
+      <section class="top-bar">
+        <div class="tabs">
+          <button class="tab active" data-type="lista" type="button">Lista</button>
+          <button class="tab" data-type="pila" type="button">Pila</button>
+          <button class="tab" data-type="cola" type="button">Cola</button>
+          <button class="tab" data-type="arbol" type="button">Árbol BST</button>
+          <button class="tab" data-type="grafo" type="button">Grafo</button>
+          <button class="tab" data-type="juego" type="button">🎮 Juego</button>
+          <button class="tab" data-type="desafio" type="button">🏆 Desafíos</button>
+          <button class="tab" data-type="evaluacion" type="button">📊 Evaluación</button>
+        </div>
+
+        <div class="status-box">
+          <span class="status-label">Estructura actual:</span>
+          <span id="tipo-actual" class="status-value">Lista</span>
+        </div>
+
+        <button id="toggle-theme" class="theme-toggle" aria-label="Cambiar tema" type="button">
+          <span class="theme-icon">☀️</span>
+          <span class="theme-track">
+            <span class="theme-thumb"></span>
+          </span>
+          <span class="theme-icon">🌙</span>
+        </button>
+      </section>
+
+      <!-- ===== VISTA: LISTA / PILA / COLA ===== -->
+      <div id="view-lineal">
+        <section class="controls-panel">
+          <div class="input-group">
+            <label for="valor">Valor</label>
+            <input type="number" id="valor" placeholder="Ingrese un número" />
+          </div>
+
+          <div class="buttons-group">
+            <div class="step-row">
+              <select id="modo-paso" class="step-select">
+                <option value="insertar">Paso a paso: Insertar</option>
+                <option value="eliminar">Paso a paso: Eliminar</option>
+              </select>
+              <button id="btn-paso" class="btn btn-dark" type="button">Paso a paso</button>
+            </div>
+
+            <div class="main-actions">
+              <button id="btn-insertar" class="btn btn-primary" type="button">Insertar</button>
+              <button id="btn-eliminar" class="btn btn-warning" type="button">Eliminar</button>
+              <button id="btn-limpiar" class="btn btn-dark" type="button">Limpiar</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="info-strip">
+          <div class="mini-card">
+            <span class="mini-title">Tamaño</span>
+            <strong id="size-value">0</strong>
+          </div>
+          <div class="mini-card">
+            <span class="mini-title">Última acción</span>
+            <strong id="last-action">Ninguna</strong>
+          </div>
+          <div class="mini-card">
+            <span class="mini-title">Descripción</span>
+            <strong id="desc-tipo">Estructura lineal</strong>
+          </div>
+        </section>
+
+        <section class="visual-card">
+          <div class="visual-header">
+            <h2 id="visual-title">Visualización de Lista</h2>
+            <p id="visual-subtitle">Representación gráfica en tiempo real</p>
+          </div>
+          <div id="visual-area" class="visual-area empty">
+            <div class="empty-state">
+              <div class="empty-icon">∅</div>
+              <p>La estructura está vacía</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="code-card">
+          <div class="code-header">
+            <h3>Pseudocódigo</h3>
+            <p id="code-subtitle">Representación lógica de la operación actual</p>
+          </div>
+          <div class="code-toolbar">
+            <span class="code-badge" id="code-structure">Lista</span>
+            <span class="code-badge action" id="code-action">En espera</span>
+          </div>
+          <div class="code-window">
+            <ol id="pseudocode-lines" class="pseudocode-lines"></ol>
+          </div>
+        </section>
+
+
+        <section class="info-card" id="info-card">
+          <div class="info-card-header">
+            <span class="info-icon" id="info-icon">🔗</span>
+            <div>
+              <h3 id="info-nombre">Lista Enlazada Simple</h3>
+              <span class="info-tipo-badge" id="info-tipo-badge">Estructura lineal</span>
+            </div>
+          </div>
+          <div class="info-body">
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">📖 ¿Qué es?</div>
+              <p id="info-descripcion">Una lista enlazada es una colección de nodos donde cada nodo almacena un dato y un puntero al siguiente nodo. A diferencia de un arreglo, los elementos no están contiguos en memoria.</p>
+            </div>
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">💼 ¿Cuándo se usa?</div>
+              <ul id="info-usos" class="info-lista"></ul>
+            </div>
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">🌍 Ejemplo real</div>
+              <div class="info-ejemplo" id="info-ejemplo"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="legend-card">
+          <h3>Referencia visual</h3>
+          <div id="legend-content" class="legend-content">
+            <div class="legend-item">
+              <span class="legend-dot dot-node"></span>
+              <span>Nodo</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot dot-special"></span>
+              <span>Cabeza / Cola</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== VISTA: ÁRBOL BST ===== -->
+      <div id="view-arbol" style="display:none;">
+        <section class="visual-card">
+          <div class="visual-header">
+            <h2>Árbol Binario de Búsqueda (BST)</h2>
+            <p id="tree-subtitle">Los nodos menores van a la izquierda, los mayores a la derecha</p>
+          </div>
+          <div class="graph-controls">
+            <label>Valor:</label>
+            <input type="number" id="tree-val" placeholder="Número" />
+            <button class="btn btn-primary" id="tree-insert" type="button">Insertar</button>
+            <button class="btn btn-warning" id="tree-delete" type="button">Eliminar</button>
+            <button class="btn btn-info" id="tree-search" type="button">Buscar</button>
+            <button class="btn btn-dark" id="tree-clear" type="button">Limpiar</button>
+            <button class="btn btn-purple" id="tree-traverse" type="button">Inorden</button>
+          </div>
+          <div class="visual-area tree-area" id="tree-area" style="min-height:350px;">
+            <div class="empty-state"><div class="empty-icon">🌳</div><p>El árbol está vacío</p></div>
+          </div>
+        </section>
+
+        <section class="code-card">
+          <div class="code-header">
+            <h3>Pseudocódigo BST</h3>
+            <p>Representación lógica de la operación actual</p>
+          </div>
+          <div class="code-toolbar">
+            <span class="code-badge">Árbol BST</span>
+            <span class="code-badge action" id="tree-code-action">En espera</span>
+          </div>
+          <div class="code-window">
+            <ol id="tree-pseudocode" class="pseudocode-lines"></ol>
+          </div>
+        </section>
+
+
+        <section class="info-card" id="info-card">
+          <div class="info-card-header">
+            <span class="info-icon" id="info-icon">🔗</span>
+            <div>
+              <h3 id="info-nombre">Lista Enlazada Simple</h3>
+              <span class="info-tipo-badge" id="info-tipo-badge">Estructura lineal</span>
+            </div>
+          </div>
+          <div class="info-body">
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">📖 ¿Qué es?</div>
+              <p id="info-descripcion">Una lista enlazada es una colección de nodos donde cada nodo almacena un dato y un puntero al siguiente nodo. A diferencia de un arreglo, los elementos no están contiguos en memoria.</p>
+            </div>
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">💼 ¿Cuándo se usa?</div>
+              <ul id="info-usos" class="info-lista"></ul>
+            </div>
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">🌍 Ejemplo real</div>
+              <div class="info-ejemplo" id="info-ejemplo"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="legend-card">
+          <h3>Referencia visual</h3>
+          <div class="legend-content">
+            <div class="legend-item"><span class="legend-dot" style="background:#1d4ed8;"></span><span>Nodo normal</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#f97316;"></span><span>Nodo resaltado</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span><span>Nodo encontrado</span></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== VISTA: GRAFO ===== -->
+      <div id="view-grafo" style="display:none;">
+        <section class="visual-card">
+          <div class="visual-header">
+            <h2>Grafo</h2>
+            <p>Estructura no lineal con nodos y aristas. Puedes crear grafos dirigidos y no dirigidos.</p>
+          </div>
+          <div class="graph-controls">
+            <label>Nodo:</label>
+            <input type="text" id="g-node" placeholder="A, B..." style="width:65px;" />
+            <button class="btn btn-primary" id="g-add-node" type="button">+ Nodo</button>
+            <span class="graph-sep">│</span>
+            <label>Arista:</label>
+            <input type="text" id="g-from" placeholder="De" style="width:50px;" />
+            <input type="text" id="g-to" placeholder="A" style="width:50px;" />
+            <input type="number" id="g-weight" placeholder="Peso" style="width:65px;" />
+            <button class="btn btn-success" id="g-add-edge" type="button">+ Arista</button>
+            <button class="btn btn-purple" id="g-bfs" type="button">BFS</button>
+            <button class="btn btn-warning" id="g-dfs" type="button">DFS</button>
+            <button class="btn btn-dark" id="g-clear" type="button">Limpiar</button>
+            <label class="graph-check-label">
+              <input type="checkbox" id="g-directed" />
+              Dirigido
+            </label>
+          </div>
+          <div class="visual-area graph-area" id="graph-area" style="min-height:380px;padding:0;">
+            <div class="empty-state"><div class="empty-icon">🔗</div><p>Agrega nodos y aristas</p></div>
+          </div>
+        </section>
+
+        <section class="code-card">
+          <div class="code-header">
+            <h3>Pseudocódigo Grafo</h3>
+            <p>Representación lógica de la operación actual</p>
+          </div>
+          <div class="code-toolbar">
+            <span class="code-badge">Grafo</span>
+            <span class="code-badge action" id="graph-code-action">En espera</span>
+          </div>
+          <div class="code-window">
+            <ol id="graph-pseudocode" class="pseudocode-lines"></ol>
+          </div>
+        </section>
+
+
+        <section class="info-card" id="info-card">
+          <div class="info-card-header">
+            <span class="info-icon" id="info-icon">🔗</span>
+            <div>
+              <h3 id="info-nombre">Lista Enlazada Simple</h3>
+              <span class="info-tipo-badge" id="info-tipo-badge">Estructura lineal</span>
+            </div>
+          </div>
+          <div class="info-body">
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">📖 ¿Qué es?</div>
+              <p id="info-descripcion">Una lista enlazada es una colección de nodos donde cada nodo almacena un dato y un puntero al siguiente nodo. A diferencia de un arreglo, los elementos no están contiguos en memoria.</p>
+            </div>
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">💼 ¿Cuándo se usa?</div>
+              <ul id="info-usos" class="info-lista"></ul>
+            </div>
+            <div class="info-bloque">
+              <div class="info-bloque-titulo">🌍 Ejemplo real</div>
+              <div class="info-ejemplo" id="info-ejemplo"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="legend-card">
+          <h3>Referencia visual</h3>
+          <div class="legend-content">
+            <div class="legend-item"><span class="legend-dot" style="background:#7c3aed;"></span><span>Nodo</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#f97316;"></span><span>Nodo actual</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span><span>Visitado</span></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== VISTA: JUEGO ===== -->
+      <div id="view-juego" style="display:none;">
+        <div class="game-card">
+          <div class="game-header">
+            <h2>🎮 Pon a prueba tu conocimiento</h2>
+            <div class="game-stats">
+              <span class="stat-pill" id="g-score">Puntos: 0</span>
+              <span class="stat-pill correct" id="g-correct">✓ 0</span>
+              <span class="stat-pill wrong" id="g-wrong">✗ 0</span>
+              <span class="stat-pill" id="g-qnum">1 / 15</span>
+            </div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="g-progress" style="width:0%"></div></div>
+
+          <div id="game-playing">
+            <div class="question-area">
+              <div class="question-text" id="q-text">Cargando pregunta...</div>
+              <div class="options-grid" id="q-options"></div>
+            </div>
+            <div class="feedback-box" id="q-feedback"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-primary" id="btn-next" style="display:none;min-width:160px;" type="button">Siguiente →</button>
+            </div>
+          </div>
+
+          <div id="game-result" class="game-result" style="display:none;">
+            <div class="result-emoji" id="r-emoji">🏆</div>
+            <div class="result-score" id="r-score">0 / 15</div>
+            <div class="result-msg" id="r-msg">¡Buen intento!</div>
+            <button class="btn btn-primary" id="btn-restart" style="margin:0 auto;display:block;min-width:180px;" type="button">Jugar de nuevo</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ===== VISTA: DESAFÍOS ===== -->
+      <div id="view-desafio" style="display:none;">
+        <div class="challenge-shell">
+
+          <!-- Selector de desafío -->
+          <div class="challenge-selector" id="ch-selector">
+            <div class="ch-header">
+              <h2>🏆 Modo Desafíos</h2>
+              <p>Pon a prueba tus habilidades construyendo estructuras de datos con instrucciones precisas.</p>
+            </div>
+            <div class="ch-stats-row">
+              <div class="ch-stat-box"><span id="ch-total-done">0</span><span>Completados</span></div>
+              <div class="ch-stat-box"><span id="ch-total-pts">0</span><span>Puntos</span></div>
+              <div class="ch-stat-box"><span id="ch-streak">0</span><span>Racha 🔥</span></div>
+            </div>
+            <div class="ch-level-tabs">
+              <button class="ch-lvl-btn active" data-level="basico" type="button">🟢 Básico</button>
+              <button class="ch-lvl-btn" data-level="intermedio" type="button">🟡 Intermedio</button>
+              <button class="ch-lvl-btn" data-level="avanzado" type="button">🔴 Avanzado</button>
+            </div>
+            <div id="ch-cards" class="ch-cards"></div>
+          </div>
+
+          <!-- Arena del desafío activo -->
+          <div class="challenge-arena" id="ch-arena" style="display:none;">
+            <button class="ch-back-btn" id="ch-back" type="button">← Volver</button>
+
+            <div class="ch-arena-header">
+              <div class="ch-badge" id="ch-lvl-badge">🟢 Básico</div>
+              <h3 id="ch-title">Título del desafío</h3>
+              <p id="ch-desc">Descripción</p>
+            </div>
+
+            <div class="ch-objective-box" id="ch-objective-box">
+              <div class="ch-obj-title">📋 Objetivo</div>
+              <div id="ch-objective">Construye lo siguiente:</div>
+              <div id="ch-steps-list" class="ch-steps-list"></div>
+            </div>
+
+            <!-- Controles dinámicos según el tipo de estructura -->
+            <div class="ch-controls" id="ch-controls"></div>
+
+            <!-- Visualización -->
+            <div class="ch-visual-wrap">
+              <div class="ch-visual-label">Tu estructura actual</div>
+              <div id="ch-visual" class="visual-area" style="min-height:180px;"></div>
+            </div>
+
+            <!-- Feedback en tiempo real -->
+            <div class="ch-progress-wrap">
+              <div class="ch-progress-label">Progreso del desafío</div>
+              <div class="ch-progress-bar"><div id="ch-progress-fill" class="ch-progress-fill" style="width:0%"></div></div>
+              <div id="ch-check-list" class="ch-check-list"></div>
+            </div>
+
+            <!-- Botón de validación -->
+            <button class="btn btn-primary ch-validate-btn" id="ch-validate" type="button">✓ Verificar solución</button>
+
+            <!-- Resultado del desafío -->
+            <div class="ch-result-box" id="ch-result" style="display:none;">
+              <div class="ch-result-emoji" id="ch-result-emoji">🎉</div>
+              <div class="ch-result-msg" id="ch-result-msg"></div>
+              <div class="ch-result-pts" id="ch-result-pts"></div>
+              <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+                <button class="btn btn-primary" id="ch-next-btn" type="button">Siguiente desafío →</button>
+                <button class="btn btn-dark" id="ch-retry-btn" type="button">Reintentar</button>
+              </div>
+            </div>
+
+          </div><!-- /arena -->
+        </div>
+      </div>
+
+
+      <!-- ===== VISTA: EVALUACIÓN (Pretest / SUS / Postest) ===== -->
+      <div id="view-evaluacion" style="display:none;">
+        <div class="eval-shell">
+
+          <!-- ── PANTALLA: Bienvenida ── -->
+          <div id="eval-welcome" class="eval-section">
+            <div class="eval-hero">
+              <div class="eval-hero-icon">📊</div>
+              <h2>Evaluación de Usabilidad y Aprendizaje</h2>
+              <p>Este formulario mide tu experiencia con la app y tu nivel de comprensión antes y después de usarla. Los datos son anónimos y se usan con fines académicos.</p>
+            </div>
+            <div class="eval-steps-preview">
+              <div class="eval-step-prev"><span class="esp-num">1</span><span>Pretest de conocimiento</span></div>
+              <div class="esp-arrow">→</div>
+              <div class="eval-step-prev"><span class="esp-num">2</span><span>Usa la aplicación</span></div>
+              <div class="esp-arrow">→</div>
+              <div class="eval-step-prev"><span class="esp-num">3</span><span>Postest + SUS</span></div>
+            </div>
+            <div class="eval-info-box">
+              <strong>¿Qué es la Escala SUS?</strong><br>
+              La <em>System Usability Scale</em> (SUS) es el instrumento de usabilidad más citado en investigación académica. Consiste en 10 preguntas validadas que producen un puntaje de 0 a 100.
+            </div>
+            <div class="eval-data-row">
+              <div class="eval-field">
+                <label for="eval-carrera">Carrera</label>
+                <select id="eval-carrera">
+                  <option value="">Seleccionar...</option>
+                  <option>Lic. Desarrollo y Gestión de Software</option>
+                  <option>Ingeniería de Sistemas</option>
+                  <option>Ingeniería en Informática</option>
+                  <option>Otra</option>
+                </select>
+              </div>
+              <div class="eval-field">
+                <label for="eval-anio">Año cursado</label>
+                <select id="eval-anio">
+                  <option value="">Seleccionar...</option>
+                  <option>1.° año</option>
+                  <option>2.° año</option>
+                  <option>3.° año</option>
+                  <option>4.° año o más</option>
+                </select>
+              </div>
+              <div class="eval-field">
+                <label for="eval-cursado">¿Ha cursado Estructuras de Datos?</label>
+                <select id="eval-cursado">
+                  <option value="">Seleccionar...</option>
+                  <option>Sí, la aprobé</option>
+                  <option>Actualmente la curso</option>
+                  <option>No la he cursado</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary eval-cta" id="eval-start" type="button">Comenzar evaluación →</button>
+          </div>
+
+          <!-- ── PANTALLA: Pretest ── -->
+          <div id="eval-pretest" class="eval-section" style="display:none;">
+            <div class="eval-phase-header">
+              <div class="eval-phase-badge">Fase 1 de 3</div>
+              <h3>📝 Pretest — Conocimiento previo</h3>
+              <p>Responde estas preguntas <strong>antes</strong> de explorar la aplicación. No te preocupes si no sabes algunas — es parte del estudio.</p>
+            </div>
+            <div id="pretest-questions" class="eval-q-list"></div>
+            <button class="btn btn-primary eval-cta" id="pretest-submit" type="button">Guardar respuestas y continuar →</button>
+          </div>
+
+          <!-- ── PANTALLA: Usar la app ── -->
+          <div id="eval-use-app" class="eval-section" style="display:none;">
+            <div class="eval-phase-header">
+              <div class="eval-phase-badge" style="background:#0d9488;color:#fff;">Fase 2 de 3</div>
+              <h3>🚀 Explora la aplicación</h3>
+              <p>Ahora usa libremente los módulos de <strong>Lista, Pila, Cola, Árbol BST, Grafo y el Juego</strong>. Cuando termines de explorar, regresa aquí.</p>
+            </div>
+            <div class="eval-use-tips">
+              <div class="eval-tip">💡 Prueba el <strong>modo paso a paso</strong> en Lista, Pila o Cola</div>
+              <div class="eval-tip">🌳 Inserta varios valores en el <strong>Árbol BST</strong> y ejecuta un recorrido</div>
+              <div class="eval-tip">🔗 Crea un <strong>Grafo</strong> con 3 nodos y ejecuta BFS o DFS</div>
+              <div class="eval-tip">🎮 Completa al menos 5 preguntas del <strong>Juego</strong></div>
+            </div>
+            <div class="eval-use-btns">
+              <button class="btn btn-primary" id="eval-goto-lista" type="button">Ir a explorar →</button>
+              <button class="btn btn-dark" id="eval-continue-postest" type="button">Ya exploré — Continuar al postest →</button>
+            </div>
+          </div>
+
+          <!-- ── PANTALLA: Postest + SUS ── -->
+          <div id="eval-postest" class="eval-section" style="display:none;">
+            <div class="eval-phase-header">
+              <div class="eval-phase-badge" style="background:#7c3aed;color:#fff;">Fase 3 de 3</div>
+              <h3>📋 Postest + Escala SUS</h3>
+              <p>Responde estas preguntas <strong>después</strong> de haber explorado la aplicación.</p>
+            </div>
+
+            <div class="eval-subsection-title">Parte A — Postest de conocimiento</div>
+            <div id="postest-questions" class="eval-q-list"></div>
+
+            <div class="eval-subsection-title" style="margin-top:28px;">
+              Parte B — Escala SUS (System Usability Scale)
+              <span class="sus-info">Las opciones van de 1 (Totalmente en desacuerdo) a 5 (Totalmente de acuerdo)</span>
+            </div>
+            <div id="sus-questions" class="eval-q-list sus-list"></div>
+
+            <div class="eval-subsection-title" style="margin-top:28px;">Parte C — Preguntas abiertas</div>
+            <div class="eval-open-questions">
+              <div class="eval-open-q">
+                <label>¿Qué fue lo que más te gustó de la aplicación?</label>
+                <textarea id="open-1" rows="2" placeholder="Escribe tu respuesta..."></textarea>
+              </div>
+              <div class="eval-open-q">
+                <label>¿Qué mejorarías o agregarías?</label>
+                <textarea id="open-2" rows="2" placeholder="Escribe tu respuesta..."></textarea>
+              </div>
+              <div class="eval-open-q">
+                <label>¿Usarías esta aplicación como apoyo en tu carrera?</label>
+                <div class="eval-yesno" id="open-yesno">
+                  <button class="yn-btn" data-val="si" type="button">✅ Sí</button>
+                  <button class="yn-btn" data-val="probablemente" type="button">🤔 Probablemente</button>
+                  <button class="yn-btn" data-val="no" type="button">❌ No</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary eval-cta" id="postest-submit" type="button">✓ Enviar evaluación completa</button>
+          </div>
+
+          <!-- ── PANTALLA: Resultados ── -->
+          <div id="eval-results" class="eval-section" style="display:none;">
+            <div class="eval-result-hero">
+              <div class="eval-result-icon" id="eval-result-icon">🎉</div>
+              <h3>¡Evaluación completada!</h3>
+              <p>Gracias por participar. Estos son tus resultados:</p>
+            </div>
+
+            <div class="eval-result-cards">
+              <div class="eval-rcard">
+                <div class="eval-rcard-label">Pretest</div>
+                <div class="eval-rcard-score" id="r-pretest-score">—</div>
+                <div class="eval-rcard-sub">Conocimiento previo</div>
+              </div>
+              <div class="eval-rcard">
+                <div class="eval-rcard-label">Postest</div>
+                <div class="eval-rcard-score" id="r-postest-score">—</div>
+                <div class="eval-rcard-sub">Conocimiento posterior</div>
+              </div>
+              <div class="eval-rcard highlight">
+                <div class="eval-rcard-label">Mejora</div>
+                <div class="eval-rcard-score" id="r-mejora">—</div>
+                <div class="eval-rcard-sub">Ganancia de aprendizaje</div>
+              </div>
+              <div class="eval-rcard sus-card">
+                <div class="eval-rcard-label">Puntaje SUS</div>
+                <div class="eval-rcard-score" id="r-sus-score">—</div>
+                <div class="eval-rcard-sub" id="r-sus-label">—</div>
+              </div>
+            </div>
+
+            <div class="sus-scale-bar">
+              <div class="sus-bar-track"><div class="sus-bar-fill" id="sus-bar-fill"></div><div class="sus-bar-marker" id="sus-bar-marker"></div></div>
+              <div class="sus-bar-labels"><span>0</span><span>25</span><span>50</span><span>68</span><span>80</span><span>100</span></div>
+              <div class="sus-bar-cats"><span>Inaceptable</span><span>Marginal</span><span>Aceptable</span><span>Bueno</span><span>Excelente</span></div>
+            </div>
+
+            <div id="eval-server-status" style="display:none;font-size:0.9rem;font-weight:700;padding:10px;border-radius:8px;margin-bottom:12px;background:var(--bg);border:1.5px solid var(--border);text-align:center;"></div>
+            <div class="eval-export-box">
+              <p>Copia estos datos para entregárselos al investigador:</p>
+              <textarea id="eval-export-text" rows="10" readonly style="width:100%;font-family:monospace;font-size:0.8rem;border-radius:8px;padding:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);resize:vertical;"></textarea>
+              <button class="btn btn-dark" id="eval-copy-btn" type="button">📋 Copiar datos</button>
+            </div>
+
+            <button class="btn btn-primary" id="eval-restart" type="button" style="margin-top:12px;">Nueva evaluación</button>
+          </div>
+
+        </div><!-- /eval-shell -->
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="js/tutor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
