@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultados SUS — Visual Data Structure</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.top{background:#1e293b;border-bottom:1px solid #334155;padding:16px 24px;display:flex;align-items:center;gap:16px}
+.top h1{font-size:1.2rem;font-weight:800;color:#fff}
+.top span{font-size:0.85rem;color:#64748b}
+.body{padding:24px;max-width:1200px;margin:0 auto}
+.login-box{max-width:360px;margin:80px auto;background:#1e293b;border-radius:16px;padding:32px;border:1px solid #334155}
+.login-box h2{font-size:1.3rem;font-weight:800;margin-bottom:8px}
+.login-box p{color:#64748b;font-size:0.9rem;margin-bottom:20px}
+input{width:100%;padding:10px 14px;border-radius:8px;border:1.5px solid #334155;background:#0f172a;color:#e2e8f0;font-size:1rem;margin-bottom:12px}
+input:focus{outline:none;border-color:#6366f1}
+button{width:100%;padding:11px;border-radius:8px;border:none;background:#6366f1;color:#fff;font-size:1rem;font-weight:700;cursor:pointer}
+button:hover{background:#4f46e5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px;text-align:center}
+.card-n{font-size:2.2rem;font-weight:900;color:#6366f1;line-height:1}
+.card-lbl{font-size:0.78rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+.card-sub{font-size:0.82rem;color:#94a3b8;margin-top:2px}
+.card.green .card-n{color:#22c55e}
+.card.teal .card-n{color:#14b8a6}
+.card.purple .card-n{color:#a78bfa}
+.card.orange .card-n{color:#fb923c}
+.sus-bar-wrap{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px}
+.sus-bar-wrap h3{font-size:1rem;font-weight:700;margin-bottom:14px}
+.sus-track{height:20px;background:#334155;border-radius:20px;position:relative;overflow:visible;margin-bottom:8px}
+.sus-fill{height:100%;border-radius:20px;transition:width 1s ease}
+.sus-labels{display:flex;justify-content:space-between;font-size:0.72rem;color:#64748b}
+.table-wrap{background:#1e293b;border:1px solid #334155;border-radius:12px;overflow:hidden;margin-top:20px}
+.table-wrap h3{padding:16px 20px;font-size:1rem;font-weight:700;border-bottom:1px solid #334155}
+table{width:100%;border-collapse:collapse;font-size:0.85rem}
+th{background:#0f172a;color:#94a3b8;font-weight:700;font-size:0.75rem;text-transform:uppercase;padding:10px 14px;text-align:left}
+td{padding:10px 14px;border-bottom:1px solid #1e293b;color:#e2e8f0}
+tr:hover td{background:#1e3a5f}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:0.75rem;font-weight:700}
+.badge.ex{background:#16a34a;color:#fff}
+.badge.bu{background:#2563eb;color:#fff}
+.badge.ac{background:#0d9488;color:#fff}
+.badge.ma{background:#d97706;color:#fff}
+.badge.in{background:#dc2626;color:#fff}
+.err{background:#7f1d1d;border:1px solid #dc2626;border-radius:8px;padding:14px;margin:16px 0;font-size:0.9rem}
+.refresh{background:#334155;color:#e2e8f0;width:auto;padding:8px 16px;font-size:0.85rem;border-radius:8px;margin-left:auto;display:block}
+.export-btn{background:#0d9488;width:auto;padding:8px 16px;font-size:0.85rem;border-radius:8px;margin-left:8px}
+.top-actions{display:flex;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div id="login-view">
+  <div class="login-box">
+    <h2>🔐 Panel de Administración</h2>
+    <p>Visual Data Structure — Resultados de Evaluación SUS</p>
+    <input type="password" id="key-input" placeholder="Clave de acceso" />
+    <button onclick="cargar()">Ingresar</button>
+    <div id="login-err" style="display:none;color:#f87171;font-size:0.85rem;margin-top:10px;"></div>
+  </div>
+</div>
+
+<div id="main-view" style="display:none;">
+  <div class="top">
+    <h2>📊 Visual Data Structure — Resultados SUS</h2>
+    <span id="top-total"></span>
+    <span style="margin-left:auto;font-size:0.8rem;color:#4b5563" id="top-fecha"></span>
+  </div>
+
+  <div class="body">
+    <div class="top-actions">
+      <button class="refresh" onclick="cargar()">🔄 Actualizar</button>
+      <button class="export-btn" onclick="exportarCSV()">📥 Exportar CSV</button>
+    </div>
+
+    <div class="grid" id="stats-grid"></div>
+
+    <div class="sus-bar-wrap">
+      <h3>Puntaje SUS Promedio</h3>
+      <div class="sus-track"><div class="sus-fill" id="sus-fill"></div></div>
+      <div class="sus-labels">
+        <span>0 — Inaceptable</span>
+        <span>51 — Marginal</span>
+        <span>68 — Aceptable</span>
+        <span>80 — Bueno</span>
+        <span>100 — Excelente</span>
+      </div>
+    </div>
+
+    <div id="err-box" style="display:none;" class="err"></div>
+
+    <div class="table-wrap">
+      <h3>Evaluaciones individuales</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Carrera</th>
+            <th>Año</th>
+            <th>Cursado ED</th>
+            <th>Pretest</th>
+            <th>Postest</th>
+            <th>Mejora</th>
+            <th>SUS</th>
+            <th>Categoría</th>
+            <th>¿Usaría?</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentKey = '';
+let allData = null;
+
+function badgeSUS(cat) {
+  const map = {
+    'Excelente (A)': 'ex', 'Bueno (B)': 'bu',
+    'Aceptable (C)': 'ac', 'Marginal (D)': 'ma', 'Inaceptable (F)': 'in'
+  };
+  const cls = map[cat] || 'in';
+  return `<span class="badge ${cls}">${cat}</span>`;
+}
+
+function susColor(score) {
+  if (score >= 90) return '#22c55e';
+  if (score >= 80) return '#2563eb';
+  if (score >= 68) return '#14b8a6';
+  if (score >= 51) return '#d97706';
+  return '#dc2626';
+}
+
+async function cargar() {
+  const key = document.getElementById('key-input')?.value || currentKey;
+  if (!key) return;
+  currentKey = key;
+
+  const API = '../api/obtener_resultados.php?key=' + encodeURIComponent(key);
+  try {
+    const res  = await fetch(API);
+    const data = await res.json();
+
+    if (!data.ok) {
+      if (document.getElementById('login-err')) {
+        document.getElementById('login-err').style.display = '';
+        document.getElementById('login-err').textContent = '❌ Clave incorrecta';
+      }
+      return;
+    }
+
+    allData = data;
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('main-view').style.display  = '';
+
+    const s = data.stats;
+    const total = parseInt(s.total);
+    document.getElementById('top-total').textContent = `${total} evaluaciones registradas`;
+    document.getElementById('top-fecha').textContent  = 'Actualizado: ' + new Date().toLocaleString('es-PA');
+
+    // Stats cards
+    const pctMejora = total ? Math.round((s.mejoraron / total) * 100) : 0;
+    const pctUsarian = total ? Math.round((s.usarian_si / total) * 100) : 0;
+
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="card"><div class="card-n">${total}</div><div class="card-lbl">Participantes</div></div>
+      <div class="card purple"><div class="card-n">${parseFloat(s.sus_promedio).toFixed(1)}</div><div class="card-lbl">SUS Promedio</div><div class="card-sub">${s.sus_min} – ${s.sus_max}</div></div>
+      <div class="card"><div class="card-n">${parseFloat(s.pre_promedio).toFixed(1)}</div><div class="card-lbl">Pretest promedio</div><div class="card-sub">de 5</div></div>
+      <div class="card teal"><div class="card-n">${parseFloat(s.post_promedio).toFixed(1)}</div><div class="card-lbl">Postest promedio</div><div class="card-sub">de 5</div></div>
+      <div class="card green"><div class="card-n">+${parseFloat(s.mejora_promedio).toFixed(1)}</div><div class="card-lbl">Mejora promedio</div><div class="card-sub">${pctMejora}% mejoraron</div></div>
+      <div class="card orange"><div class="card-n">${pctUsarian}%</div><div class="card-lbl">Usarían la app</div></div>
+    `;
+
+    // Barra SUS
+    const susProm = parseFloat(s.sus_promedio);
+    document.getElementById('sus-fill').style.width      = susProm + '%';
+    document.getElementById('sus-fill').style.background = susColor(susProm);
+
+    // Tabla
+    const tbody = document.getElementById('tabla-body');
+    if (!data.evaluaciones.length) {
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#64748b;padding:32px">Sin evaluaciones aún</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.evaluaciones.map((e, i) => `
+      <tr>
+        <td>${e.id}</td>
+        <td style="white-space:nowrap;font-size:0.78rem">${e.fecha_hora}</td>
+        <td style="font-size:0.8rem">${e.carrera}</td>
+        <td>${e.anio}</td>
+        <td style="font-size:0.8rem">${e.cursado}</td>
+        <td style="text-align:center">${e.pretest_score}/${e.total_preguntas}</td>
+        <td style="text-align:center">${e.postest_score}/${e.total_preguntas}</td>
+        <td style="text-align:center;color:${parseInt(e.mejora)>=0?'#22c55e':'#f87171'};font-weight:700">${parseInt(e.mejora)>=0?'+':''}${e.mejora}</td>
+        <td style="text-align:center;font-weight:800;color:${susColor(parseFloat(e.sus_score))}">${e.sus_score}</td>
+        <td>${badgeSUS(e.sus_categoria)}</td>
+        <td style="text-align:center">${e.usaria_app === 'si' ? '✅' : e.usaria_app === 'probablemente' ? '🤔' : '❌'}</td>
+      </tr>
+    `).join('');
+
+  } catch (err) {
+    document.getElementById('err-box').style.display = '';
+    document.getElementById('err-box').textContent   = 'Error de conexión: ' + err.message;
+  }
+}
+
+function exportarCSV() {
+  if (!allData?.evaluaciones?.length) return;
+  const cols = ['id','fecha_hora','carrera','anio','cursado','pretest_score','postest_score','mejora','total_preguntas','sus_score','sus_categoria','usaria_app','open_gusto','open_mejora'];
+  const header = cols.join(',');
+  const rows = allData.evaluaciones.map(e =>
+    cols.map(c => `"${(e[c]||'').toString().replace(/"/g,'""')}"`).join(',')
+  );
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'VDS_Evaluaciones_SUS_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+document.getElementById('key-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') cargar();
+});
+</script>
+</body>
+</html>
